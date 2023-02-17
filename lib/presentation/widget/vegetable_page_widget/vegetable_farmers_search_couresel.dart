@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:untitled3/controller/farmer_controller.dart';
-import 'package:untitled3/data/cereal_data.dart';
-import 'package:untitled3/data/crop_data.dart';
-import 'package:untitled3/data/farmer_data.dart';
-import 'package:untitled3/data/fruit_data.dart';
-import 'package:untitled3/data/vegetable_data.dart';
-import 'package:untitled3/presentation/pages/select_farmer.dart';
-import 'package:untitled3/presentation/widget/reusable_widget/big_text.dart';
-import 'package:untitled3/presentation/widget/reusable_widget/small_text.dart';
+import 'package:Farmdrive/controller/farmer_controller.dart';
+import 'package:Farmdrive/data/crop_data.dart';
+import 'package:Farmdrive/presentation/pages/home/select_farmer.dart';
+import 'package:Farmdrive/presentation/widget/reusable_widget/big_text.dart';
+import 'package:Farmdrive/presentation/widget/reusable_widget/small_text.dart';
+
+import '../../../data/product_model.dart';
 
 class VegetablesFarmersSearch extends StatelessWidget {
-  Crop crop;
+  ProductModel crop;
   double leftPadding;
   VegetablesFarmersSearch({Key? key, required this.crop,required this.leftPadding,}) : super(key: key);
   @override
@@ -43,7 +41,7 @@ class VegetablesFarmersSearch extends StatelessWidget {
                                 width:190,
                                 child: GestureDetector(
                                   onTap:(){
-                                    Get.to(()=>SelectFarmer(crop: crop));
+                                    //Get.to(()=>SelectFarmer(crop: crop));
                                   },
 
                                   child: Container(
@@ -62,7 +60,6 @@ class VegetablesFarmersSearch extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              const SmallText(text:'filter by',colorValue:0x8A000000),
                               Row(children:[
                                 SizedBox(
                                   height:50,
@@ -251,7 +248,6 @@ class VegetablesFarmersSearch extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children:[
-                        const SmallText(text:'selected',colorValue:0x8A000000),
                         SizedBox(
                           width:70,
                           child: farmerController.getFarmer(crop) == null? const Text(
@@ -263,7 +259,7 @@ class VegetablesFarmersSearch extends StatelessWidget {
                             ),
                             overflow: TextOverflow.clip,
                           ):Text(
-                            farmerController.getFarmer(crop)!.name,
+                            farmerController.getFarmer(crop)!.name!,
                             style: const TextStyle(
                               fontSize:16,
                               fontWeight:FontWeight.w600,

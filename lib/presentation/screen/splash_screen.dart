@@ -1,9 +1,9 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'nav_screen.dart';
+import 'order_screen.dart';
 
 class  SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -21,13 +21,13 @@ class _State extends State<SplashScreen>with TickerProviderStateMixin {
     super.initState();
     animationController =
         AnimationController(vsync: this,
-            duration:const Duration(seconds:3))..forward();
+            duration:const Duration(seconds:2))..forward();
     animation = CurvedAnimation(parent:animationController,curve:Curves.elasticOut);
 
 
     Timer(
-      const Duration(seconds: 3),
-        ()=> Get.off(()=>const NavScreen())
+      const Duration(seconds: 2),
+        ()=> Get.off(()=>const NavBar())
     );
   }
   @override
@@ -43,23 +43,18 @@ class _State extends State<SplashScreen>with TickerProviderStateMixin {
       body:Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children:   [
-          ScaleTransition(
-            scale:animation,
-            child: const Image(
-              image:AssetImage('assets/logo/vegetable_logo.png'),
-              height:130,
-              width:130,
-            ),
-          ),
-          Center(
-            child: Text(
-                'Farmdrive',
-                style:TextStyle(
-                    color: Colors.lightGreen.shade800,
-                    fontSize:35,
-                    fontWeight: FontWeight.bold
-                )
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ScaleTransition(
+                scale:animation,
+                child: const Image(
+                  image:AssetImage('assets/logo/vegetable_logo.png'),
+                  height:130,
+                  width:130,
+                ),
+              ),
+            ],
           ),
         ],
       )

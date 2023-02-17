@@ -3,17 +3,19 @@ import 'dart:ui';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/src/simple/get_controllers.dart';
-import 'package:untitled3/%20repository/cart_repository.dart';
-import 'package:untitled3/data/cart_model.dart';
-import 'package:untitled3/data/crop_data.dart';
-import 'package:untitled3/data/farmer_data.dart';
+import 'package:Farmdrive/%20repository/cart_repository.dart';
+import 'package:Farmdrive/data/cart_model.dart';
+
+import '../data/farmer_model.dart';
+import '../data/model/crop_pricing.dart';
+import '../data/product_model.dart';
 
 class CartController extends GetxController {
  final CartRepo cartRepo;
  CartController({required this.cartRepo});
 
 
-  Map<String, Cart> _items = {};
+  Map<int, Cart> _items = {};
   Map get items => _items;
 
 
@@ -21,8 +23,8 @@ class CartController extends GetxController {
   set setStorageItems (List<Cart> cartItems){
     storageItems = cartItems;
     for(var i= 0;i<storageItems.length;i++){
-      print(storageItems[i]);
-      items.putIfAbsent(storageItems[i].crop.type, () => storageItems[i]);
+     // print(storageItems[i]);
+      items.putIfAbsent(storageItems[i].crop.id, () => storageItems[i]);
     }
   }
 
@@ -31,27 +33,30 @@ class CartController extends GetxController {
     return storageItems;
   }
 
-  void addItem({required Farmer? farmer,required Crop crop, required int quantity}) {
+  void addItem({required String size,required String classification,required CropPricing? cropPricing,required FarmerModel? farmerModel,required ProductModel crop, required int quantity}) {
     var totalQuantity =0;
-    if(farmer != null) {
-      if (_items.containsKey(crop.type)) {
-        _items.update(crop.type, (value) {
+    if(farmerModel != null) {
+      if (_items.containsKey(crop.id)) {
+        _items.update(crop.id!, (value) {
           totalQuantity = quantity + value.quantity;
           if (totalQuantity > 50) {
             Get.snackbar('ItemCount', 'You cannot increase more !!');
           }
           return Cart(
-            farmer: farmer,
+            size:size,
+            classification: classification,
+            cropPricing: cropPricing,
+            farmerModel: farmerModel,
             time: DateTime.now().toString(),
             crop: crop,
             image: value.image,
             quantity: totalQuantity > 50 ? 50 : quantity + value.quantity,
             type: value.type,
-            price: value.price,
+            price: 20,
           );
         });
         if (totalQuantity <= 0) {
-          _items.remove(crop.type);
+          _items.remove(crop.id);
         }
       } else {
         if (quantity <= 0) {
@@ -60,15 +65,18 @@ class CartController extends GetxController {
             backgroundColor: const Color(0xFFE3F2FD),
           );
         } else {
-          _items.putIfAbsent(crop.type, () {
+          _items.putIfAbsent(crop.id!, () {
             return Cart(
-              farmer: farmer,
+              size:size,
+              classification:classification,
+              cropPricing: cropPricing,
+              farmerModel: farmerModel,
               time: DateTime.now().toString(),
               crop: crop,
-              image: crop.image,
+              image: crop.thumbnail!,
               quantity: quantity,
-              type: crop.type,
-              price: crop.price,
+              type: crop.kind!,
+              price: 22,
             );
           });
         }
@@ -82,11 +90,11 @@ class CartController extends GetxController {
     }
   }
 
-  int  getQuantity( Crop crop){
+  int  getQuantity( ProductModel crop){
     var quantity= 0;
-      if(_items.containsKey(crop.type)){
+      if(_items.containsKey(crop.id)){
         _items.forEach((key, value) {
-          if (key == crop.type) {
+          if (key == crop.id) {
             quantity = value.quantity;
           }
         });
@@ -95,8 +103,8 @@ class CartController extends GetxController {
   }
 
 
-  bool exists(Crop crop){
-    if(_items.containsKey(crop.type)){
+  bool exists(ProductModel crop){
+    if(_items.containsKey(crop.id)){
       return true;
     }else{
       return false;
@@ -120,22 +128,42 @@ List<Cart> get getItems {
 int get getTotal{
     int total = 0;
     _items.forEach((key,value){
-      total += value.quantity * value.price;
+      if(value.cropPricing == null || value.cropPricing!.cost == null) {
+        total += value.quantity * value.price;
+      }else {
+        total += value.quantity * value.cropPricing!.cost!;
+      }
     });
     return total;
 }
-void addToCartHistoryList({required int index,required Crop crop}){
+void addToCartHistoryList({required int index,required Cart cart}){
     cartRepo.addToCartHistoryList(index);
-    remove(crop);
 
+    remove(cart);
+  update();
 }
+
+
+
+
 List<Cart> getCartHistory(){
     return cartRepo.getCartHistoryList();
 }
 
- void remove(Crop crop){
-    _items.remove(crop.type);
+ void remove(Cart cart){
+    _items.remove(cart.crop.id);
     update();
  }
 
+ void removeCartList(){
+    _items = {};
+    update();
+ }
+
+ clearCart(){
+    _items = {};
+    cartRepo.remove();
+    cartRepo.removeCartHistoryList();
+    update();
+ }
 }

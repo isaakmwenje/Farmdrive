@@ -3,9 +3,10 @@ import 'dart:ui';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
-import 'package:untitled3/%20repository/product_repostitory.dart';
-import 'package:untitled3/data/crop_data.dart';
-import 'package:untitled3/data/farmer_data.dart';
+import 'package:Farmdrive/%20repository/product_repostitory.dart';
+import '../data/farmer_model.dart';
+import '../data/model/crop_pricing.dart';
+import '../data/product_model.dart';
 import 'cart_controller.dart';
 
 class ProductController extends GetxController{
@@ -52,7 +53,7 @@ class ProductController extends GetxController{
       return quantity ;
     }
   }
-  void initProduct(CartController cart,Crop crop){
+  void initProduct(CartController cart,ProductModel crop){
     _quantity = 0;
     _cart = cart;
     _inCartItems = 0;
@@ -63,18 +64,18 @@ class ProductController extends GetxController{
      }
   }
 
-  void addItem({required Crop crop,required Farmer? farmer}){
-      _cart.addItem(crop:crop, quantity:_quantity, farmer: farmer);
+  void addItem({required String size,required String classification,required CropPricing? cropPricing,required ProductModel crop,required FarmerModel? farmerModel}){
+      _cart.addItem(size:size,classification:classification,cropPricing:cropPricing,crop:crop, quantity:_quantity, farmerModel: farmerModel);
       _quantity =0;
       _inCartItems = _cart.getQuantity(crop);
-      update();
+       update();
           }
 
    int getTotalItems(){
     return _cart.getTotalItems();
    }
 
-   int getQuantity(Crop crop){
+   int getQuantity(ProductModel crop){
    return _cart.getQuantity(crop);
    }
 }

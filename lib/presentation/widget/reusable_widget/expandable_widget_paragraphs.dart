@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:untitled3/presentation/widget/reusable_widget/small_text.dart';
+import 'package:Farmdrive/presentation/widget/reusable_widget/small_text.dart';
 
 class ExpandedParagraph extends StatefulWidget {
   String text;
@@ -36,7 +36,7 @@ class _ExpandedParagraphState extends State<ExpandedParagraph> {
          SmallText(text:hiddenText?(firstHalf+secondHalf):firstHalf),
          Row(
            children:[
-             const SmallText(text:'...   '),
+              !hiddenText?const SmallText(text:'...   '):const SizedBox.shrink(),
              InkWell(
                  onTap: () {
                    setState(() {
@@ -47,7 +47,7 @@ class _ExpandedParagraphState extends State<ExpandedParagraph> {
                      child: Row(
                        children: [
                          SmallText(text: hiddenText ? 'show less' : 'show more',
-                             colorValue: 0xFF0091EA),
+                             color:Colors.red),
                        ],
                      )
                  )

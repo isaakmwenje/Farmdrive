@@ -1,10 +1,36 @@
+import 'dart:io';
+
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:untitled3/presentation/pages/cart_history%20_page.dart';
-import 'package:untitled3/presentation/widget/cereal_couresel.dart';
-import 'package:untitled3/presentation/widget/fruit_couresel.dart';
-import 'package:untitled3/presentation/widget/vegetable_couresel_1.dart';
+import 'package:Farmdrive/controller/popular_product_controller.dart';
+import 'package:Farmdrive/presentation/pages/cart_history%20_page.dart';
+import 'package:Farmdrive/presentation/widget/cereal_couresel.dart';
+import 'package:Farmdrive/presentation/widget/fruit_couresel.dart';
+import 'package:Farmdrive/presentation/widget/vegetable_couresel_1.dart';
 import 'package:get/get.dart';
+
+import '../../ repository/cart_repository.dart';
+import '../../controller/auth_controllers.dart';
+import '../../controller/bank_controller.dart';
+import '../../controller/cart_controller.dart';
+import '../../controller/cereals_controller.dart';
+import '../../controller/connectivity.dart';
+import '../../controller/crop_pricing_controller.dart';
+import '../../controller/farmer_controller.dart';
+import '../../controller/fruits_controller.dart';
+import '../../controller/image_controller.dart';
+import '../../controller/order_controller.dart';
+import '../../controller/product_class_controller.dart';
+import '../../controller/product_controller.dart';
+import '../../controller/review_controller.dart';
+import '../../controller/user_controller.dart';
+import '../../data/product_model.dart';
+import '../../utilities/AppConstants.dart';
+import '../../utilities/color_constants.dart';
+import '../../utilities/dimensions.dart';
+import '../widget/reusable_widget/big_text.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -13,373 +39,211 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
+
 class _HomeScreenState extends State<HomeScreen> {
+  FocusNode? _focusNode = FocusNode();
+  String? selectedCrop;
   int selectedIndex = 0;
+  List   allCropList = [...Get.find<PopularProductController>().popularProductList, ...Get.find<FruitController>().fruitsList, ...Get.find<CerealsController>().cerealsList];
+  List displayList  = [];
+  bool isUpdated = false;
+  updateList(String value){
+    isUpdated = true;
+    if(value.isEmpty){
+      displayList = [];
+    }else{
+      displayList = allCropList.where((element) =>
+          element.kind!.toLowerCase().contains(value.toLowerCase())).toList();
+    }
+  }
+
+  Map _source = {ConnectivityResult.none: false};
+  final NetworkConnectivity _networkConnectivity = NetworkConnectivity.instance;
+  String string = '';
+  bool isOnline = false;
+  void initState() {
+    super.initState();
+    _networkConnectivity.initialise();
+    _networkConnectivity.myStream.listen((source) {
+      _source = source;
+      print('source $_source');
+      // 1.
+      switch (_source.keys.toList()[0]) {
+        case ConnectivityResult.mobile:
+          string =
+          _source.values.toList()[0] ? 'Online'  : 'You\'re offline';
+          if(_source.values.toList()[0] ) isOnline = true;
+          break;
+        case ConnectivityResult.wifi:
+          string =
+          _source.values.toList()[0] ? 'Online' : 'You\'re offline';
+          if(_source.values.toList()[0] ) isOnline = true;
+          break;
+        case ConnectivityResult.none:
+        default:
+          string = 'You\'re offline';
+      }
+      // 2.
+      setState(() {});
+      // 3
+    });
+  }
+
+  @override
+  void dispose() {
+    _networkConnectivity.disposeStream();
+    super.dispose();
+  }
+
+
+
+  void  _loadResource(){
+    if(Get.find<AuthController>().userLoggedIn()){
+      if(!Get.find<AuthController>().getUser()) {
+        Get.find<UserController>().getUserInfo();
+        Get.find<AuthController>().getUserId();
+        Get.find<OrderController>().getDeliveredOrders();
+        Get.find<ReviewController>().getReviewData;
+        Get.find<ReviewController>().getReviewTextData;
+      }else{
+        Get.find<AuthController>().getFarmerId();
+        Get.find<FarmerController>().geCropPricing();
+        Get.find<FarmerController>().getSelectedCropList();
+        Get.find<BankController>().getBankList();
+        Get.find<FarmerController>().getCropPricingData;
+        Get.find<UserController>().getFarmerInfo();
+        Get.find<OrderController>().getCustomerOrders();
+        Get.find<OrderController>().getDeliveredStorageData;
+      }
+      Get.find<ImageController>().getProfileImage();
+      Get.find<OrderController>().getOrderData;
+      Get.find<OrderController>().getCancelledStorageData;
+      Get.find<OrderController>().getConfirmedStorageData;
+      Get.find<OrderController>().getPayedStorageData;
+    }
+    Get.find<ProductClassController>().getCropClasses();
+    Get.find<CerealsController>().getCerealsList();
+    Get.find<PopularProductController>().getPopularProductList();
+    Get.find<CerealsController>().getCerealsList();
+    Get.find<FruitController>().getFruitsList();
+    Get.find<FarmerController>().getCropFarmers();
+    Get.find<FarmerController>().getFarmerData;
+    Get.find<CropPricingController>().getCropPricingData;
+    Get.find<CartController>().getCartData;
+    Get.find<CartRepo>().getCartHistoryList();
+    Get.find<CropPricingController>().getCropPricingList();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-             endDrawer: Drawer(
-               child: Column(
-                 crossAxisAlignment: CrossAxisAlignment.start,
-                 children: [
-                   Container(
-                     height:220,
-                     width:340,
-                     color:Colors.green,
-                     child:Row(
-                       mainAxisAlignment: MainAxisAlignment.center,
-                       children:const[
-                         CircleAvatar(
-                           radius:30,
-                         ),
-                         SizedBox(width:15),
-                         Text(
-                             "UserName",
-                           style:TextStyle(
-                             color:Colors.white,
-                             fontSize:18,
-                             letterSpacing:1.4,
-                           )
-                         )
-                       ]
-                     )
-                   ),
-                   const Padding(
-                     padding: EdgeInsets.all(8.0),
-                     child:  Text(
-                       'ACCOUNT',
-                        style:TextStyle(
-                          color:Colors.black54,
-                          fontWeight:FontWeight.bold,
-                          letterSpacing:1.2,
-                        )
-                     ),
-                   ),
-                   Padding(
-                     padding: const EdgeInsets.only(left:12),
-                     child: Column(
-                       children: [
-                         Row(
-                           mainAxisAlignment: MainAxisAlignment.start,
-                           children: const [
-                             Icon(
-                               Icons.person_add,
-                             ),
-                             SizedBox(width: 10,),
-                             Text(
-                                 'Sign Up',
-                                 style:TextStyle(
-                                   letterSpacing:1.2,
-                                   fontWeight:FontWeight.w500,
-                                   fontSize:18,
-                                 )
-                             )
-                           ],),
-                         const SizedBox(height: 10,),
-                         Row(
-                           crossAxisAlignment: CrossAxisAlignment.start,
-                           mainAxisAlignment: MainAxisAlignment.start,
-                           children: [
-                             const Icon(
-                               Icons.smartphone_outlined,
-                             ),
-                             const SizedBox(width: 10),
-                             Column(
-                               children: const [
-                                 Text(
-                                     'Contact',
-                                     style:TextStyle(
-                                       letterSpacing:1.2,
-                                       fontWeight:FontWeight.w500,
-                                       fontSize:18,
-                                     )
-                                 ),
-                                 SizedBox(height: 3.0),
-                                 Text(
-                                     'phone no',
-                                     style:TextStyle(
-                                       color:Colors.black45,
-                                       letterSpacing:1.2,
-                                       fontWeight:FontWeight.w500,
-                                       fontSize:15,
-                                     )
-                                 ),
-                               ],
-                             )
-                           ],
-                         ),
-                         const SizedBox(height: 10,),
-                         Row(
-                           crossAxisAlignment: CrossAxisAlignment.start,
-                           mainAxisAlignment: MainAxisAlignment.start,
-                           children: [
-                             const Icon(
-                               Icons.location_on,
-                             ),
-                             const SizedBox(width: 10,),
-                             Column(
-                               crossAxisAlignment: CrossAxisAlignment.start,
-                               children: const [
-                                 Text(
-                                     'Location',
-                                     style:TextStyle(
-                                       letterSpacing:1.2,
-                                       fontWeight:FontWeight.w500,
-                                       fontSize:18,
-                                     )
-                                 ),
-                                 SizedBox(height: 3),
-                                 Text(
-                                     'address',
-                                     style:TextStyle(
-                                       color:Colors.black45,
-                                       letterSpacing:1.2,
-                                       fontWeight:FontWeight.w500,
-                                       fontSize:15,
-                                     )
-                                 ),
-                               ],
-                             ),
-                           ],
-                         ),
-                         SizedBox(height: 10,),
-                         Row(
-                             crossAxisAlignment: CrossAxisAlignment.start,
-                             mainAxisAlignment: MainAxisAlignment.start,
-                             children: [
-                               const Icon(
-                                 Icons.alternate_email_sharp,
-                               ),
-                               const SizedBox(width: 10,),
-                               Column(
-                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                 children: const [
-                                   Text(
-                                       'Username',
-                                       style:TextStyle(
-                                         letterSpacing:1.2,
-                                         fontWeight:FontWeight.w500,
-                                         fontSize:18,
-                                       )
-                                   ),
-                                   SizedBox(height:3),
-                                   Text(
-                                       'name',
-                                       style:TextStyle(
-                                         color:Colors.black45,
-                                         letterSpacing:1.2,
-                                         fontWeight:FontWeight.w500,
-                                         fontSize:15,
-                                       )
-                                   ),
+    allCropList = [...Get.find<PopularProductController>().popularProductList, ...Get.find<FruitController>().fruitsList, ...Get.find<CerealsController>().cerealsList];
+    _focusNode?.unfocus();
+    if(isOnline){
+      _loadResource();
+      isOnline = false;
+    }
+    return   RefreshIndicator(
+      color:AppColors.mainColor,
+      onRefresh: () async{
+        _loadResource();
+      },
+      child: Scaffold(
+              backgroundColor: Colors.white24,
+              body:GestureDetector(
+                onTap:(){
+                  FocusScope.of(context).unfocus();
+                  isUpdated = false;
+                },
+                child: SafeArea(
+                  child: SafeArea(
+                    child: ListView(
+                      padding:EdgeInsets.symmetric(horizontal:Dimensions.width12),
+                      children:  [
+                        SizedBox(height:Dimensions.height6),
+                        string == 'Online'?SizedBox.shrink():BigText(text:string,size:18),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children:[
+                            BigText(text:'Farmdrive',size:26),
+                            Row(
+                              children: [
+                                GetBuilder<ImageController>(
+                                  builder: (imageController) {
+                                    return CircleAvatar(
+                                      backgroundColor: Colors.grey[300],
+                                      backgroundImage:imageController.imagePath != null ?NetworkImage(
+                                        AppConstants.BASE_URL+imageController
+                                            .imagePath!,
+                                      )  : null,
+                                    );
+                                  }
+                                ),
+                                SizedBox(width:Dimensions.width4/2),
+                              ],
+                            )
+                          ]
+                        ),
+                        SizedBox(height:Dimensions.height6*2),
+                        Container(
+                          //margin:EdgeInsets.only(left:Dimensions.width20),
+                          //padding: const EdgeInsets.all(6.0),
+                          alignment: Alignment.centerLeft,
+                          height: Dimensions.height10*5,
+                          decoration:BoxDecoration(
+                            color:Colors.grey[100],
+                            borderRadius:BorderRadius.circular(20.0),
+                          ),
+                          child: TextField(
+                            cursorColor: AppColors.mainColor,
+                            decoration:InputDecoration(
+                              prefixIcon: Icon(Icons.search,color:Colors.black,size:30),
+                              suffixIcon:Icon(Icons.import_export_outlined,color:Colors.black),
+                              hintText: 'Search crop to buy',
+                              border:OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                  borderSide: BorderSide(
+                                    color:Colors.grey[100]!,
+                                  )
+                              ),
 
-                                 ],
-                               )
-                             ]
-                         ),
-                       ]
-                     ),
-                   ),
-                   const SizedBox(height: 16,),
-                   const Padding(
-                     padding: EdgeInsets.only(left:8.0,bottom:8.0),
-                     child: Text(
-                         'NOTIFICATIONS',
-                         style:TextStyle(
-                           color:Colors.black54,
-                           fontWeight:FontWeight.bold,
-                           letterSpacing:1.2,
-                         )
-                     ),
-                   ),
-                   Padding(
-                     padding: const EdgeInsets.only(left:12),
-                     child: Column(
-                       children: [
-                         GestureDetector(
-                           onTap:(){
-                             Get.to(()=>const CartHistory());
-                           },
-                           child: Row(
-                             mainAxisAlignment: MainAxisAlignment.start,
-                             children: const [
-                               Icon(
-                                 Icons.shopping_cart,
-                               ),
-                               SizedBox(width: 10,),
-                               Text(
-                                   'Cart',
-                                   style:TextStyle(
-                                     letterSpacing:1.2,
-                                     fontWeight:FontWeight.w500,
-                                     fontSize:18,
-                                   )
-                               )
-                             ],),
-                         ),
-                         SizedBox(height: 20,),
-                         Row(
-                           crossAxisAlignment: CrossAxisAlignment.start,
-                           mainAxisAlignment: MainAxisAlignment.start,
-                           children: [
-                             const Icon(
-                               Icons.group,
-                             ),
-                             const SizedBox(width: 10),
-                             Column(
-                               children: const [
-                                 Text(
-                                     'Favorites',
-                                     style:TextStyle(
-                                       letterSpacing:1.2,
-                                       fontWeight:FontWeight.w500,
-                                       fontSize:18,
-                                     )
-                                 ),
-                               ],
-                             )
-                           ],
-                         ),
-                         const SizedBox(height: 16,),
-                         Row(
-                           crossAxisAlignment: CrossAxisAlignment.start,
-                           mainAxisAlignment: MainAxisAlignment.start,
-                           children: [
-                             const Icon(
-                               Icons.check_box,
-                             ),
-                             const SizedBox(width: 10,),
-                             Column(
-                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                 children: const [
-                                   Text(
-                                       'Delivery',
-                                       style:TextStyle(
-                                         letterSpacing:1.2,
-                                         fontWeight:FontWeight.w500,
-                                         fontSize:18,
-                                       )
-                                   ),
-                                 ] ),
-                           ],
-                         ),
-                       ],
-                     ),
-                   ),
-                   const SizedBox(height:16),
-                   const Padding(
-                     padding:  EdgeInsets.only(left:8.0,bottom:8.0),
-                     child: Text(
-                         'SETTINGS',
-                         style:TextStyle(
-                           color:Colors.black54,
-                           fontWeight:FontWeight.bold,
-                           letterSpacing:1.2,
-                         )
-                     ),
-                   ),
-                   Padding(
-                     padding: const EdgeInsets.only(left:12),
-                     child: Row(
-                       crossAxisAlignment: CrossAxisAlignment.start,
-                       mainAxisAlignment: MainAxisAlignment.start,
-                       children: [
-                         const Icon(
-                           Icons.star,
-                         ),
-                         const SizedBox(width: 10),
-                         Column(
-                           crossAxisAlignment: CrossAxisAlignment.start,
-                           children: const [
-                             Text(
-                                 'Preferences',
-                                 style:TextStyle(
-                                   letterSpacing:1.2,
-                                   fontWeight:FontWeight.w500,
-                                   fontSize:18,
-                                 )
-                             ),
-                             SizedBox(height: 3,),
-                             Text(
-                                 'set calls preferences',
-                                 style:TextStyle(
-                                   color:Colors.black45,
-                                   letterSpacing:1.2,
-                                   fontWeight:FontWeight.w500,
-                                   fontSize:15,
-                                 )
-                             ),
-                           ],
-                         )
-                       ],
-                     ),
-                   ),
-                    Padding(
-                     padding: const EdgeInsets.only(left:8.0,top:16.0),
-                     child: Column(
-                       crossAxisAlignment: CrossAxisAlignment.start,
-                       children: const [
-                         Text(
-                           'HELP',
-                           style:TextStyle(
-                             letterSpacing:1.2,
-                             fontWeight:FontWeight.w500,
-                             fontSize:18,
-                           )
-                         ),
-                         Text(
-                           "view application's manual",
-                             style:TextStyle(
-                               color:Colors.black45,
-                               letterSpacing:1.2,
-                               fontWeight:FontWeight.w500,
-                               fontSize:15,
-                             )
-                         )
-                       ],
-                     ),
-                   )
-                     ],
-                   ),
-             ),
-             appBar:AppBar(
-               title:const Text(
-                 'Farmdrive',
-                 style:TextStyle(
-                   color: Colors.white,
-                   fontSize:35,
-                   fontWeight: FontWeight.bold
-                 )
-               ),
-               backgroundColor:Colors.lightBlueAccent[700],
-                 actions:[
-                   IconButton(
-                     onPressed:(){},
-                     icon: const Icon(Icons.notification_important,size:26),
-                   ),
-                 const SizedBox(width:4),
-                 const CircleAvatar(
-                 radius: 18,
-                 ),
-                 Builder(
-                   builder: (context) {
-                     return IconButton(
-                         icon :const Icon( Icons.more_vert) ,
-                         onPressed:(){
-                           Scaffold.of(context).openEndDrawer();
-                             }
-                           );
-                   }
-                 )
-               ]     ),
-            body:ListView(
-              children: const [
-                VegetableCouresel(),
-                FruitCouresel(),
-                CerealCouresel(),
-              ],
+                              focusedBorder:OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                borderSide: BorderSide(
+                                  color:Colors.grey[100]!,
+                                )
 
-            ),
+                              ),
+                              enabledBorder:OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                  borderSide: BorderSide(
+                                    color:Colors.grey[100]!,
+                                  )
 
-   );}
+                            ),
+                            ),
+                            onChanged: (String value){
+                              setState(() {
+                                updateList(value);
+                              });
+                            },
+
+                            autofocus: false,
+                            onSubmitted: (value) {
+                              isUpdated = true;
+                            },
+                          ),
+                        ),
+                        SizedBox(height:Dimensions.height10*2),
+                        VegetableCouresel(displayList:isUpdated?displayList:[]),
+                        FruitCouresel(),
+                        CerealCouresel()
+                      ],
+
+                    ),
+                  ),
+                ),
+              ),
+
+   ),
+    );}
 }

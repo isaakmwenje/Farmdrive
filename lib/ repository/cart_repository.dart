@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:untitled3/data/cart_model.dart';
+import 'package:Farmdrive/data/crop_data.dart';
+
+import '../data/cart_model.dart';
 
 class CartRepo
 {
@@ -24,7 +26,7 @@ class CartRepo
   List<Cart> getCartList(){
     List<Cart> cartItems = [];
     //sharedPreferences.remove('cartList');
-    //sharedPreferences.remove('historyCartList');
+   // remove();
     if(sharedPreferences.containsKey('cartList')){
       cartList = sharedPreferences.getStringList('cartList')!;
     }
@@ -35,9 +37,11 @@ class CartRepo
   }
 
  void addToCartHistoryList(int index){
+
     List cartItems = [];
     final time = DateTime.now().toString();
     for(var element in cartList){
+
       cartItems.add(Cart.fromJson(jsonDecode(element)));
     }
 
@@ -45,10 +49,13 @@ class CartRepo
       element.time = time;
     }
 
+    List<int> indexes =[ ] ;
+    indexes.add(index);
+    //print('indexes'+indexes.toString());
     for(int i=0;i<cartList.length;i++){
-      if(i == index) {
-        historyCartList.add(cartList[i]);
-      }
+        if(i == index) {
+          historyCartList.add(cartList[i]);
+        }
     }
     sharedPreferences.setStringList('historyCartList',historyCartList);
     //getCartHistoryList();
@@ -57,7 +64,10 @@ class CartRepo
 
  List<Cart> getCartHistoryList() {
    List<Cart> historyCartItems = [];
+   //();
+   //sharedPreferences.remove('historyCartList');
    if (sharedPreferences.containsKey('historyCartList')) {
+     //removeCartHistoryList();
      historyCartList = sharedPreferences.getStringList('historyCartList')!;
    }
      historyCartList.forEach((element) {
@@ -68,7 +78,11 @@ class CartRepo
 
  void remove(){
     cartList = [];
-    sharedPreferences.remove('cartList');
+    sharedPreferences.remove('cartList'); }
+
+ void removeCartHistoryList(){
+    historyCartList = [];
+    sharedPreferences.remove('historyCartList');
  }
 
 }

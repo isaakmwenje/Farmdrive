@@ -17,9 +17,9 @@ String getDate(String date){
   final aDate = DateTime(dateTime.year,dateTime.month,dateTime.day);
 
   if(aDate == today){
-    return 'today';
+    return 'Today';
   }else if(aDate == yesterday){
-    return 'yesterday';
+    return 'Yesterday';
   }else if(aDate == twoDaysAgo){
        var  weekDay = DateFormat('EEEE').format(dateTime);
        var  day = DateFormat('d').format(dateTime);
@@ -42,7 +42,6 @@ String getDate(String date){
     return weekDay+', $day';
   }else{
     var  monthDay = DateFormat('MMMMd').format(dateTime);
-    var  month = DateFormat('MMMM').format(dateTime);
-    return monthDay+', $month';
+    return monthDay;
   }
 }
