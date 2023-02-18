@@ -40,7 +40,7 @@ Farmdrive is a mobile app that serves as a bridge between farmers and potential 
     
 
 ## 📲Installation
-Navigate to the [releases page](https://github.com/mwakicodes/cryptoboard/releases) and download and install the [latest version](https://github.com/mwakicodes/Cryptoboard/releases/download/v0.0.1-alpha/Cryptoboard.v0.0.1-alpha.apk). 
+Navigate to the [releases page](https://github.com/isaakmwenje/Farmdrive/releases) and download and install the [latest version](https://github.com/isaakmwenje/Farmdrive/releases). 
 
 > Previous versions are located there too.🔖
 ## 🧘‍♂️Motivation
@@ -55,7 +55,7 @@ The next few alpha releases focus on the following:
   * [ ] shipping to Google Play Store
   * [ ] shipping to Apple App Store
 
-> All communications regarding future releases & breaking changes will be communicated via my [socials](#connect) and on the [releases page](https://github.com/mwakicodes/cryptoboard/releases). 🚨
+> All communications regarding future releases & breaking changes will be communicated via my [socials](#connect) and on the [releases page](https://github.com/isaakmwenje/Farmdrive/releases). 🚨
 
 ## 🤼Contributing
 I am more than happy to collaborate with the dev community on this project. Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change. UI/UX and the design community is most welcome too.
