@@ -40,7 +40,7 @@ Farmdrive is a mobile app that serves as a bridge between farmers and potential 
     
 
 ## 📲Installation
-Navigate to the [releases page](https://github.com/isaakmwenje/Farmdrive/releases) and download and install the [latest version](https://github.com/isaakmwenje/Farmdrive/releases). 
+Navigate to the [releases page](https://github.com/isaakmwenje/Farmdrive/releases) and download and install the [latest version](https://github.com/isaakmwenje/Farmdrive/releases/tag/v0.0.1-alpha). 
 
 > Previous versions are located there too.🔖
 ## 🧘‍♂️Motivation
